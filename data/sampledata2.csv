@@ -1,0 +1,3 @@
+CHR,START,END,ID,SVTYPE
+chr16,87891296,87891296,insertion_test,insertion
+chr12,32841994,32850927,inversion_test,inversion
