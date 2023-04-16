@@ -22,8 +22,8 @@ bash Miniconda3-latest-Linux-x86_64.sh
 After installing conda, PhenoSV sources can be downloaded:
 
 ```
-git clone https://github.com/WGLab/Project_PhenoSV.git
-cd Project_PhenoSV
+git clone https://github.com/WGLab/PhenoSV.git
+cd PhenoSV
 conda env create --name phenosv --file phenosv.yml
 conda activate phenosv
 ```
