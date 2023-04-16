@@ -127,3 +127,23 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+phenosv/model/__pycache__/
+phenosv/__pycache__/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# scratch notebook
+scratch.ipynb
+
+# Mac files
+.DS_Store
+phenosv/data/.DS_Store
+
+
+# Pycharm
+.idea/
