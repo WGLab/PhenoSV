@@ -9,6 +9,6 @@ setup(
     license='MIT',
     packages=find_packages(),
     project_urls={
-            "Web Server": "http://phenosv.wglab.org"
+            "Web Server": "https://phenosv.wglab.org"
     }
 )
