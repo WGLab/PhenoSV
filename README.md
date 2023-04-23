@@ -195,8 +195,13 @@ bash annotation.sh data/sampledata.csv path/to/output/folder/ 4
 
 ## Archived datasets
 
-We deposited simulated patients' SV profiles used in manuscript for prioritizations along with PhenoSV scores for each SV. Use the codes below to download. Note that, each file corresponds to one patient's SV profile after filtering out all common SVs, in which the first row is the real disease-associated SV. We hided the coordinates of all SVs from DECIPHER, but one can query the information from https://www.deciphergenomics.org 
+We deposited simulated patients' SV profiles used in manuscript for prioritizations. Several things to notice:
+- Each file corresponds to one patient's SV profile after filtering out all common SVs
+- Within each SV profile, the first row is the real disease-associated SV, the rest SVs are noise rare SVs. 
+- We hided the coordinates of all SVs from DECIPHER, but one can query the information from https://www.deciphergenomics.org 
+- The column of `Pathogenicity` represents general pathogenicity scores predicted by PhenoSV ($p_{sv}$), `Phen2Gene` represents gene-phenotype associations, and `PhenoSV` represents SV pathogenicity associated with given phenotype information ($p_{sv}^{pheno}$) when setting $\alpha=1$.
 
+Use the codes below to download the simulation data. 
 ```wget https://www.openbioinformatics.org/PhenoSV/prioritization_simulation.tar.gz```
 
 
