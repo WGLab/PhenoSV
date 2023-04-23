@@ -192,3 +192,11 @@ python3 phenosv/model/annotation.py --sv_file data/sampledata.csv --target data/
 #Annotate SVs using multiple CPU cores in parallel (4 cores in the example)
 bash annotation.sh data/sampledata.csv path/to/output/folder/ 4
 ```
+
+## Archived datasets
+
+We deposited simulated patients' SV profiles used in manuscript for prioritizations. Use the codes below to download. Note that, each file corresponds to one patient's SV profile after filtering out all common SVs, in which the first row is the real disease-associated SV. We hided the coordinates of all SVs from DECIPHER, but one can query the information from https://www.deciphergenomics.org 
+
+```wget https://www.openbioinformatics.org/PhenoSV/prioritization_simulation.tar.gz```
+
+
