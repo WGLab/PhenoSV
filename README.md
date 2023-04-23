@@ -203,6 +203,8 @@ We deposited simulated patients' SV profiles used in manuscript for prioritizati
 
 Use the codes below to download the simulation data. 
 
-```wget https://www.openbioinformatics.org/PhenoSV/prioritization_simulation.tar.gz```
+```
+wget https://www.openbioinformatics.org/PhenoSV/prioritization_simulation.tar.gz
+```
 
 
