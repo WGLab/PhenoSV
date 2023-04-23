@@ -202,6 +202,7 @@ We deposited simulated patients' SV profiles used in manuscript for prioritizati
 - The column of `Pathogenicity` represents general pathogenicity scores predicted by PhenoSV ($p_{sv}$), `Phen2Gene` represents gene-phenotype associations, and `PhenoSV` represents SV pathogenicity associated with given phenotype information ($p_{sv}^{pheno}$) when setting $\alpha=1$.
 
 Use the codes below to download the simulation data. 
+
 ```wget https://www.openbioinformatics.org/PhenoSV/prioritization_simulation.tar.gz```
 
 
