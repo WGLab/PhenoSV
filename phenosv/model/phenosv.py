@@ -11,6 +11,8 @@ from liftover import get_lifter
 
 
 parser = argparse.ArgumentParser(description='PhenoSV: phenotype-aware structural variants scoring')
+parser.add_argument('--config',action='store_true')
+parser.add_argument('--config_omit',dest='config', action='store_false')
 #settings
 parser.add_argument('--genome', type=str, default='hg38', help="choose genome build between hg38 (default) and hg19")
 parser.add_argument('--alpha',type=float,default=1.0, required=False, help="A positive value with larger value representing more contribution of phenotype information in refining PhenoSV scores. Default is 1")
@@ -63,6 +65,10 @@ def main():
     args = parser.parse_args()
     configs = init()
     feature_files, scaler_file, ckpt_path, elements_path, annotation_path, tad_path, KBPATH = list(configs.values())
+    if args.config:
+        print(configs)
+        exit()
+
     #genome build
     assert args.genome=='hg19' or args.genome=='hg38',f' only support hg19 and hg38'
     if args.genome=='hg19':

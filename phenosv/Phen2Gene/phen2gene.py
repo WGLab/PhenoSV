@@ -13,8 +13,6 @@ from Phen2Gene.prioritize import gene_prioritization
 from Phen2Gene.weight_assignment import assign
 from Phen2Gene.calculation import calc, calc_simple
 
-KBpath='/home/xu3/Phen2Gene/lib'
-
 
 
 def phen2gene(HPO,KBpath='/home/xu3/Phen2Gene/lib', scale_score=False):
