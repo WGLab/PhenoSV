@@ -81,6 +81,8 @@ options:
 
 ### Score a single SV
 
+The running time of PhenoSV to score a single SV depends on the number of genes it impacted. For the examples below, PhenoSV is expected to generate results within a few seconds.
+
 #### deletion, duplication, insertion, inversion
 You can use the following codes to score a single SV (deletion, duplication, insertion, inversion) easily by providing the SV location and type. The arguments required are: --c: chromosome, --s: start position, --e: end position (can be ignored by insertions), --svtype: types of SV.
 
