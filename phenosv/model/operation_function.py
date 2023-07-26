@@ -280,7 +280,8 @@ def sv_transformation(CHR, START, END, SVTYPE, ID,elements_path, annotation_path
 
 
 #coding model features
-def read_local_features_singlesv(chr, start, end, svtype, elements_path, feature_files, scaler_file, return_coords=False):
+def read_local_features_singlesv(chr, start, end, svtype, elements_path, feature_files, scaler_file, return_coords=False,
+                                 feature_subset=None):
     """
     read features of a given coding SV
     elements_path: put element_path or bw element file
@@ -313,6 +314,8 @@ def read_local_features_singlesv(chr, start, end, svtype, elements_path, feature
     gene_indicators = np.expand_dims(np.array([0 if e in ['noncoding', 'sv'] else 1 for e in name_list]), 0)
     element_names = elements_coords_df['name'].tolist()
     features = np.expand_dims(features, 0)
+    if feature_subset is not None:
+        features = features[..., feature_subset]
     mask = np.ones(features.shape)
     sv_indicators = np.ones(gene_indicators.shape)
     features = torch.tensor(features).float()
@@ -327,7 +330,7 @@ def read_local_features_singlesv(chr, start, end, svtype, elements_path, feature
         return batch, element_names
 #noncoding model features
 def read_global_features_singlesv(chr, start, end, svtype, elements_path, feature_files, scaler_file, tad_path=None, return_coords=False,
-                                  truncation = None):
+                                  truncation = None, feature_subset=None):
     """
     read features of a given noncoding SV
     elements_path: put element_path or bw element file
@@ -422,6 +425,8 @@ def read_global_features_singlesv(chr, start, end, svtype, elements_path, featur
     gene_indicators = [1 if e in gene_names else 0 for e in element_name_]  # intron is accounted as genes
     gene_indicators = np.expand_dims(np.array(gene_indicators),0)
     features = np.expand_dims(features, 0)
+    if feature_subset is not None:
+        features = features[..., feature_subset]
     mask = np.ones(features.shape)
     sv_indicators = np.expand_dims(np.array([1 if 'sv' in e else 0 for e in element_names]),0)
     features = torch.tensor(features).float()
@@ -440,9 +445,9 @@ def prepare_model(ckpt_path):
     model.eval()
     return model
 
-def predict_codingsv(chr, start, end, svtype, elements_path, feature_files, scaler_file, model, calibration_cutoff=0.5):
+def predict_codingsv(chr, start, end, svtype, elements_path, feature_files, scaler_file, model, calibration_cutoff=0.5, feature_subset=None):
     # prepare features and element names
-    batch, element_names = read_local_features_singlesv(chr, start, end, svtype, elements_path, feature_files, scaler_file)
+    batch, element_names = read_local_features_singlesv(chr, start, end, svtype, elements_path, feature_files, scaler_file, feature_subset=feature_subset)
     # get prediction
     sv_pred, _, element_pred = model.get_element_score(batch)
     if len(element_pred)>len(element_names):
@@ -456,9 +461,9 @@ def predict_codingsv(chr, start, end, svtype, elements_path, feature_files, scal
     df = pd.DataFrame({'Elements': element_names, 'Pathogenicity': sv_pred_cali, 'Type':type_indicator})
     return df
 
-def predict_noncodingsv(chr,start, end, svtype,elements_path,feature_files,scaler_file,model,tad_path=None, calibration_cutoff=0.5, truncation=None):
+def predict_noncodingsv(chr,start, end, svtype,elements_path,feature_files,scaler_file,model,tad_path=None, calibration_cutoff=0.5, truncation=None, feature_subset=None):
     #prepare features and element names
-    batch,element_names = read_global_features_singlesv(chr,start, end, svtype,elements_path,feature_files,scaler_file,tad_path, False,truncation)
+    batch,element_names = read_global_features_singlesv(chr,start, end, svtype,elements_path,feature_files,scaler_file,tad_path, False,truncation, feature_subset=feature_subset)
     gene_names,intronic_gene_names = get_global_genes(chr,start,end,elements_path,tad_path)
     sv_pred, _, element_pred = model.get_element_score(batch)
     if len(element_pred)>len(element_names):
@@ -483,7 +488,7 @@ def predict_noncodingsv(chr,start, end, svtype,elements_path,feature_files,scale
 
 def phenosv(CHR, START, END, svtype,sv_df=None, annotation_path=None, model=None, elements_path=None, feature_files=None, scaler_file=None,
             tad_path=None,cutoff_coding=0.4934, cutoff_noncoding=0.7901, HPO=None, pheno_adjust=1,KBpath='/home/xu3/Phen2Gene/lib', full_mode = False,
-            CHR2=None, START2=None,strand1='+',strand2='+'):
+            CHR2=None, START2=None,strand1='+',strand2='+', feature_subset=None):
     if svtype in ['insertion','inversion']:
         sv_df = pd.DataFrame({'CHR':[CHR],'START':[START],'END':[END],'SVTYPE':[svtype],'ID':[CHR+':'+str(START)+'-'+str(END)+'_'+str(svtype)]})
     if svtype=='translocation':
@@ -514,7 +519,7 @@ def phenosv(CHR, START, END, svtype,sv_df=None, annotation_path=None, model=None
             sv_df_append = sv_df_append.merge(sv_df[['ID','HPO']],how='left').reset_index(drop=True)
         pred = multi_sv(sv_df_append, annotation_path, model, elements_path, feature_files, scaler_file, tad_path=tad_path,
                  cutoff_coding=cutoff_coding, cutoff_noncoding=cutoff_noncoding, HPO=HPO, pheno_adjust=pheno_adjust, full_mode=full_mode,
-                 KBpath=KBpath)
+                 KBpath=KBpath, feature_subset=feature_subset)
         pred = pred.reset_index(drop=True)
         idx = pred.groupby(['ID', 'Elements'], sort=False)['Pathogenicity'].idxmax()
         pred = pred.loc[idx].reset_index(drop=True)
@@ -522,19 +527,19 @@ def phenosv(CHR, START, END, svtype,sv_df=None, annotation_path=None, model=None
         pred = single_sv(CHR, START, END, svtype, annotation_path, model, elements_path, feature_files, scaler_file,
                   tad_path=tad_path,cutoff_coding=cutoff_coding, cutoff_noncoding=cutoff_noncoding, HPO=HPO,
                   pheno_adjust=pheno_adjust, KBpath=KBpath,
-                  full_mode=full_mode, truncation=None)
+                  full_mode=full_mode, truncation=None, feature_subset=feature_subset)
     return pred
 
 def single_sv(CHR, START, END, svtype, annotation_path, model, elements_path, feature_files, scaler_file,tad_path=None,
               cutoff_coding=0.5, cutoff_noncoding=0.5, HPO=None, pheno_adjust=1,KBpath='/home/xu3/Phen2Gene/lib',
-              full_mode = False,truncation=None):
+              full_mode = False,truncation=None, feature_subset=None):
     """
     annotation_path: can be a path or bed file
     """
     if u.annot_sv_single(CHR, START, END, annotation_path) == 'coding':
-        pred = predict_codingsv(CHR, START, END, svtype, elements_path, feature_files,scaler_file, model, cutoff_coding)
+        pred = predict_codingsv(CHR, START, END, svtype, elements_path, feature_files,scaler_file, model, cutoff_coding, feature_subset=feature_subset)
         if full_mode:
-            pred2 = predict_noncodingsv(CHR, START, END, svtype, elements_path, feature_files,scaler_file, model, tad_path, cutoff_noncoding)
+            pred2 = predict_noncodingsv(CHR, START, END, svtype, elements_path, feature_files,scaler_file, model, tad_path, cutoff_noncoding,feature_subset=feature_subset)
             type=[]
             for t in pred2.Type.tolist():
                 if t=='Intronic':
@@ -546,7 +551,7 @@ def single_sv(CHR, START, END, svtype, annotation_path, model, elements_path, fe
             pred2.Type = type
             pred = pd.concat((pred,pred2))
     else:
-        pred = predict_noncodingsv(CHR, START, END, svtype, elements_path, feature_files,scaler_file, model, tad_path, cutoff_noncoding,truncation=truncation)
+        pred = predict_noncodingsv(CHR, START, END, svtype, elements_path, feature_files,scaler_file, model, tad_path, cutoff_noncoding,truncation=truncation,feature_subset=feature_subset)
     if HPO is not None:
         genescores = pg.phen2gene(HPO,KBpath, scale_score=True)
         if genescores is not None:
@@ -571,7 +576,7 @@ def single_sv(CHR, START, END, svtype, annotation_path, model, elements_path, fe
 
 def multi_sv(sv_df, annotation_path, model,elements_path, feature_files, scaler_file,tad_path=None,
               cutoff_coding=0.5, cutoff_noncoding=0.5, HPO=None, pheno_adjust=1, full_mode=False,
-             KBpath='/home/xu3/Phen2Gene/lib'):
+             KBpath='/home/xu3/Phen2Gene/lib',feature_subset=None):
     #HPO can be None, a string representing the same HPO for all SV, or a list representing different HPO for different SV
     pred_list=[]
     if HPO is not None:
@@ -587,7 +592,7 @@ def multi_sv(sv_df, annotation_path, model,elements_path, feature_files, scaler_
             truncation = None
         pred = single_sv(CHR, START, END, svtype, annotation_path, model, elements_path, feature_files, scaler_file,tad_path=tad_path,
               cutoff_coding=cutoff_coding, cutoff_noncoding=cutoff_noncoding, HPO=HPO[i], pheno_adjust=pheno_adjust, KBpath=KBpath,
-                         full_mode=full_mode,truncation=truncation)
+                         full_mode=full_mode,truncation=truncation,feature_subset=feature_subset)
         pred['ID'] = sv_df['ID'][i]
         pred_list.append(pred)
     pred = pd.concat(pred_list)

@@ -176,38 +176,39 @@ def summary_bw(bw_path: str)->dict:
 
 def query_bw(bw_path: str, chrom: str, start: int, end: int, nbins: int, stat='max', onlycoverage=1,
              binlen=None) -> list:
-    bw = pyBigWig.open(bw_path, "r")
-
-    if binlen is not None:
-        n_bin = math.ceil((end-start)/binlen)
-        if n_bin>1:
-            start_pos = np.linspace(start,int(end-binlen),n_bin,dtype=int)
-            end_pos = [s+binlen for s in start_pos]
+    OUT=[0]*nbins
+    if os.path.isfile(bw_path):
+        bw = pyBigWig.open(bw_path, "r")
+        if binlen is not None:
+            n_bin = math.ceil((end-start)/binlen)
+            if n_bin>1:
+                start_pos = np.linspace(start,int(end-binlen),n_bin,dtype=int)
+                end_pos = [s+binlen for s in start_pos]
+            else:
+                start_pos=[start]
+                end_pos=[end]
+            bins = list(zip(start_pos, end_pos))
+            nbins = 1
         else:
-            start_pos=[start]
-            end_pos=[end]
-        bins = list(zip(start_pos, end_pos))
-        nbins = 1
-    else:
-        bins = [(start, end)]
-
-    OUT = []
-    for Bin in bins:
-        if stat == 'q95':
-            l = bw.values(chrom, Bin[0], Bin[1])
-            l_chunks = chunk_list(l, nbins)
-            outlist = [np.nanquantile(l, 0.95) for l in l_chunks]
-            outlist = [0 if math.isnan(i) else i for i in outlist]
-        elif stat == 'mean' and onlycoverage == 0:
-            outlist = bw.stats(chrom, Bin[0], Bin[1], type='sum', nBins=nbins, exact=True)
-            bin_length = round((end - start) / nbins)
-            outlist = [i / bin_length if i is not None else 0 for i in outlist]
-        else:
-            outlist = bw.stats(chrom, Bin[0], Bin[1], type=stat, nBins=nbins, exact=True)
-            outlist = [i if i is not None else 0 for i in outlist]
-        OUT.append(outlist)
-        OUT = np.hstack(OUT).tolist()
+            bins = [(start, end)]
+        OUT = []
+        for Bin in bins:
+            if stat == 'q95':
+                l = bw.values(chrom, Bin[0], Bin[1])
+                l_chunks = chunk_list(l, nbins)
+                outlist = [np.nanquantile(l, 0.95) for l in l_chunks]
+                outlist = [0 if math.isnan(i) else i for i in outlist]
+            elif stat == 'mean' and onlycoverage == 0:
+                outlist = bw.stats(chrom, Bin[0], Bin[1], type='sum', nBins=nbins, exact=True)
+                bin_length = round((end - start) / nbins)
+                outlist = [i / bin_length if i is not None else 0 for i in outlist]
+            else:
+                outlist = bw.stats(chrom, Bin[0], Bin[1], type=stat, nBins=nbins, exact=True)
+                outlist = [i if i is not None else 0 for i in outlist]
+            OUT.append(outlist)
+            OUT = np.hstack(OUT).tolist()
     return OUT
+
 
 ########################################
 ##############bigbed ###################

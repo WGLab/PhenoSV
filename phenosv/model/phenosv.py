@@ -17,6 +17,7 @@ parser.add_argument('--config_omit',dest='config', action='store_false')
 parser.add_argument('--genome', type=str, default='hg38', help="choose genome build between hg38 (default) and hg19")
 parser.add_argument('--alpha',type=float,default=1.0, required=False, help="A positive value with larger value representing more contribution of phenotype information in refining PhenoSV scores. Default is 1")
 parser.add_argument('--inference', type=str, help="leave it blank (default) if only considering direct impacts of coding SVs. Set to `full` if inferring both direct and indirect impacts of coding SVs")
+parser.add_argument('--model', type=str, default='PhenoSV', help="choose between PhenoSV (default) and PhenoSV-light")
 
 #input single sv
 parser.add_argument('--c',type=str, help='chromosome, e.g. chr1')#chrom
@@ -40,15 +41,22 @@ parser.add_argument('--target_file_name',type=str,default='sv_score',help='enter
 
 
 
-def init(configpath=None, ckpt=False):
+
+def init(configpath=None, ckpt=False, light = False):
     if configpath is None:
         configpath = os.path.join(module_dir,'../lib/fpath.config')
     with open(configpath) as fr:
         KBPATH = fr.readline().rstrip('\n')
     Path = os.path.join(KBPATH,'data')
-    feature_files=os.path.join(Path,'features_set.csv')
-    scaler_file = os.path.join(Path, 'features1026.csv')
-    ckpt_path = os.path.join(Path, 'model-epoch=33-val_loss=0.33.ckpt')
+    if light:
+        feature_files=os.path.join(Path,'features_set_light.csv')
+        scaler_file = os.path.join(Path, 'features1026_light.csv')
+        ckpt_path = os.path.join(Path, 'model-epoch=57-val_loss=0.34.ckpt')
+    else:
+        feature_files=os.path.join(Path,'features_set.csv')
+        scaler_file = os.path.join(Path, 'features1026.csv')
+        ckpt_path = os.path.join(Path, 'model-epoch=33-val_loss=0.33.ckpt')
+
     elements_path = os.path.join(Path, 'genes_w_noncoding.bb')
     annotation_path = os.path.join(Path, 'exon_gencode.bed')
     tad_path = os.path.join(Path, 'tad_w_boundary_08.bed')
@@ -84,6 +92,12 @@ def main():
         full_mode = False
     if args.noncoding == 'distance':
         tad_path = None
+    if args.model=='PhenoSV-light':
+        feature_subset = [0, 2, 12, 13, 14, 16, 21, 22, 23, 25, 26, 27, 30, 34, 35, 37, 40, 42, 43, 44,
+                         48, 50, 51, 54, 57, 61, 64, 70, 71, 80, 86, 94, 119, 136, 165, 175, 178, 184, 189, 223, 224,
+                         -1]
+    else:
+        feature_subset = None
 
     if args.sv_file is not None:
         assert args.sv_file.endswith('.bed') or args.sv_file.endswith('.csv') or args.sv_file.endswith('.bedpe'), f"please input a bed file or a csv file"
@@ -128,7 +142,7 @@ def main():
 
         pred = of.phenosv(None, None, None, None, sv_df, annotation_path, model, elements_path, feature_files, scaler_file,
                    tad_path,cutoff_coding=0.4934, cutoff_noncoding=0.7901, HPO=HPO, pheno_adjust=args.alpha,
-                   KBpath=KBPATH,full_mode=full_mode, CHR2=None, START2=None, strand1='+', strand2='+')
+                   KBpath=KBPATH,full_mode=full_mode, CHR2=None, START2=None, strand1='+', strand2='+', feature_subset=feature_subset)
     else: #single SV
         s, e, s2 = args.s, args.e, args.s2
         if converter is not None:
@@ -143,7 +157,8 @@ def main():
 
         pred=of.phenosv(args.c, s, e, args.svtype, None, annotation_path, model, elements_path, feature_files, scaler_file,
                    tad_path, cutoff_coding=0.4934, cutoff_noncoding=0.7901, HPO=args.HPO, pheno_adjust=args.alpha,
-                   KBpath=KBPATH, full_mode=full_mode, CHR2=args.c2, START2=s2, strand1=args.strand1, strand2=args.strand2)
+                   KBpath=KBPATH, full_mode=full_mode, CHR2=args.c2, START2=s2, strand1=args.strand1, strand2=args.strand2,
+                        feature_subset=feature_subset)
 
 
     if args.target_folder is None:
