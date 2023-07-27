@@ -28,11 +28,19 @@ conda activate phenosv
 ```
 
 ### Step2: download and set up required files
-Some files are required by PhenoSV, including genomic feature files, the pre-trained PhenoSV model, Phen2Gene knowledgebases, etc. All of them have been packed together and can be downloaded using codes below. Make sure to store these files under a directory with enough storage space (about 200G). This directory can be different from the one used to save PhenoSV source codes. Due to the large size of feature files, this step might take some time. Simply run codes below to set up everything. 
+Some files are required by PhenoSV, including genomic feature files, the pre-trained PhenoSV model, Phen2Gene knowledgebases, etc. All of these files required by the full version of PhenoSV have been packed together and can be downloaded using codes below. The packed file takes about 160G storage, please make sure to store these files under a directory with enough space. This directory can be different from the one used to save PhenoSV source codes. Due to the large size of feature files, this step might take some time. Simply run codes below to set up everything. 
 
 ```
 bash setup.sh /path/to/folder
 ```
+
+We also offered a light-weight version of PhenoSV as a highly efficient alternative of PhenoSV. PhenoSV-light consists of only 42 features with much improved annotation efficiency without compromising predictive accuracy except for translocations. The packed file takes about 50G storage. Run the codes below to set up PhenoSV-light. 
+
+```
+bash setup.sh /path/to/folder 'light'
+```
+
+Note that, users who downloaded the full set of required files using can excute both PhenoSV and PhenoSV-light. Users who downloaded the light version files can only excute PhenoSV-light.
 
 ### Step3: install PhenoSV as a python package (optional)
 
