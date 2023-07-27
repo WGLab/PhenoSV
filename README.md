@@ -177,9 +177,12 @@ import phenosv.model.operation_function as of
 config_path = os.path.join(os.path.dirname(phenosv.__file__), '..', 'lib', 'fpath.config')
 configs, ckpt = init(config_path, ckpt = True, light = False)
 
-# set 'tad_path' as None to consider genes within 1Mbp uptream and downstream a noncoding SV. 
+# set 'tad_path' as None to consider genes within 1Mbp uptream and downstream a noncoding SV.
 # do not run this line if you want to use TAD annotations to interpret noncoding SVs
 configs['tad_path']=None
+
+# users can also specify tissue-specific TAD annotations based on research goals
+# simply assign TAD annotation path using configs['tad_path']='path/to/tad_annotation.bed'
 
 #load model
 model = of.prepare_model(ckpt)
