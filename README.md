@@ -67,6 +67,7 @@ options:
   --inference INFERENCE
                         leave it blank (default) if only considering direct impacts of coding SVs. Set to `full` if inferring both
                         direct and indirect impacts of coding SVs
+  --model MODEL         choose between PhenoSV (default) and PhenoSV-light
   --c C                 chromosome, e.g. chr1
   --s S                 start, e.g. 2378909
   --e E                 end, e.g. 2379909
@@ -115,6 +116,12 @@ PhenoSV will output results below. Without considering phenotype information, Ph
 
 ```
 
+To run the PhenoSV-light model, simply add --model 'PhenoSV-light' as shown below.
+
+```
+python3 phenosv/model/phenosv.py --c chr6 --s 156994830 --e 157006982 --svtype 'deletion' --model 'PhenoSV-light'
+```
+
 #### translocation
 
 PhenoSV can also be used to interpret translocations. The arguments required are: --c: 5' chromosome, --s: 5' breakpoint, --c2: 3' chromosome, --s2: 3' breakpoint, --svtype: types of SV (translocation); --strand1:  5' strand and --strand2:  3' strand are optional with '+' as default.
@@ -148,6 +155,13 @@ You can also score multiple SVs in parallel to speed up. Below is an example of 
 bash phenosv/model/phenosv.sh 'path/to/sv/data.csv' 'folder/path/to/store/results' 4 'HP:0000707,HP:0007598'
 ```
 
+Similarly, run codes below for PhenoSV-light model.
+
+```
+bash phenosv/model/phenosv_light.sh 'path/to/sv/data.csv' 'folder/path/to/store/results' 4 'HP:0000707,HP:0007598'
+```
+
+
 ## Run PhenoSV in Python
 
 You can run PhenoSV in Python and the output will be a pandas dataframe with the SV-level and the gene-level predictions for a given SV.
@@ -159,13 +173,16 @@ import phenosv
 from phenosv.model.phenosv import init as init
 import phenosv.model.operation_function as of
 
-#get configurations
+#get configurations, use the light argument for choosing between PhenoSV and PhenoSV-light
 config_path = os.path.join(os.path.dirname(phenosv.__file__), '..', 'lib', 'fpath.config')
-configs, ckpt = init(config_path,True)
+configs, ckpt = init(config_path, ckpt = True, light = False)
 
-# set 'tad_path' as None to consider genes within 1Mbp uptream and downstream a noncoding SV. 
+# set 'tad_path' as None to consider genes within 1Mbp uptream and downstream a noncoding SV.
 # do not run this line if you want to use TAD annotations to interpret noncoding SVs
 configs['tad_path']=None
+
+# users can also specify tissue-specific TAD annotations based on research goals
+# simply assign TAD annotation path using configs['tad_path']='path/to/tad_annotation.bed'
 
 #load model
 model = of.prepare_model(ckpt)
