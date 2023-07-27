@@ -52,7 +52,11 @@ def init(configpath=None, ckpt=False, light = False):
         feature_files=os.path.join(Path,'features_set_light.csv')
         scaler_file = os.path.join(Path, 'features1026_light.csv')
         ckpt_path = os.path.join(Path, 'model-epoch=57-val_loss=0.34.ckpt')
+        feature_subset = [0, 2, 12, 13, 14, 16, 21, 22, 23, 25, 26, 27, 30, 34, 35, 37, 40, 42, 43, 44,
+                          48, 50, 51, 54, 57, 61, 64, 70, 71, 80, 86, 94, 119, 136, 165, 175, 178, 184, 189, 223, 224,
+                          -1]
     else:
+        feature_subset = None
         feature_files=os.path.join(Path,'features_set.csv')
         scaler_file = os.path.join(Path, 'features1026.csv')
         ckpt_path = os.path.join(Path, 'model-epoch=33-val_loss=0.33.ckpt')
@@ -62,10 +66,11 @@ def init(configpath=None, ckpt=False, light = False):
     tad_path = os.path.join(Path, 'tad_w_boundary_08.bed')
     if ckpt:
         return {'feature_files': feature_files, 'scaler_file': scaler_file, 'elements_path': elements_path,
-                'annotation_path': annotation_path, 'tad_path': tad_path, 'KBpath': KBPATH}, ckpt_path,
+                'annotation_path': annotation_path, 'tad_path': tad_path, 'KBpath': KBPATH,
+                'feature_subset': feature_subset}, ckpt_path
     else:
         return {'feature_files':feature_files,'scaler_file':scaler_file,'ckpt_path':ckpt_path,'elements_path':elements_path,
-            'annotation_path':annotation_path,'tad_path':tad_path,'KBpath':KBPATH}
+            'annotation_path':annotation_path,'tad_path':tad_path,'KBpath':KBPATH,'feature_subset': feature_subset}
 
 
 def main():
@@ -75,7 +80,7 @@ def main():
         configs = init(light = True)
     else:
         configs = init(light = False)
-    feature_files, scaler_file, ckpt_path, elements_path, annotation_path, tad_path, KBPATH = list(configs.values())
+    feature_files, scaler_file, ckpt_path, elements_path, annotation_path, tad_path, KBPATH, feature_subset = list(configs.values())
     if args.config:
         print(configs)
         exit()
@@ -95,12 +100,6 @@ def main():
         full_mode = False
     if args.noncoding == 'distance':
         tad_path = None
-    if args.model=='PhenoSV-light':
-        feature_subset = [0, 2, 12, 13, 14, 16, 21, 22, 23, 25, 26, 27, 30, 34, 35, 37, 40, 42, 43, 44,
-                         48, 50, 51, 54, 57, 61, 64, 70, 71, 80, 86, 94, 119, 136, 165, 175, 178, 184, 189, 223, 224,
-                         -1]
-    else:
-        feature_subset = None
 
     if args.sv_file is not None:
         assert args.sv_file.endswith('.bed') or args.sv_file.endswith('.csv') or args.sv_file.endswith('.bedpe'), f"please input a bed file or a csv file"
