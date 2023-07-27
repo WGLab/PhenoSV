@@ -100,6 +100,9 @@ def main():
         full_mode = False
     if args.noncoding == 'distance':
         tad_path = None
+    if args.noncoding.endswith('.bed'):
+        tad_path = args.noncoding
+
 
     if args.sv_file is not None:
         assert args.sv_file.endswith('.bed') or args.sv_file.endswith('.csv') or args.sv_file.endswith('.bedpe'), f"please input a bed file or a csv file"
