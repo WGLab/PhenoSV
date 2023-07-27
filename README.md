@@ -207,6 +207,32 @@ END = u.liftover(CHR, END, converter)
 of.phenosv(CHR=CHR, START=START, END=END, svtype='deletion', model=model, HPO=None, **configs)
 
 ```
+## User defined TAD annotations
+
+PhenoSV relies on pre-determined sets of candidate genes when interpreting the impacts of noncoding SVs, either by distance or TAD annotations. We already included an aggregated version of TAD annotation file with PhenoSV. This annotation file is tissue-unspecific. Users can access to this file under the `data` folder at pre-assigned path (saved in lib/fpath.config). The file name is `tad_w_boundary_08.bed`
+
+Since TAD annotations are tissue specific, users can also use their own TAD annotations depending on different study goals. The annotation file should be in bed format. Run codes below to assign different annotation files. 
+
+```
+python3 phenosv/model/phenosv.py --c chr6 --s 156994830 --e 157006982 --svtype 'deletion' --noncoding 'path/to/tad_annotation.bed'
+```
+
+Here is an example showing the format of the TAD annotation file. Four columns are 'CHR', 'START','END', and 'Indicators' (0 means TAD domain, 1 means TAD boundaries).
+
+```
+chr1    0       724620  0
+chr1    724620  764620  1
+chr1    764620  3423436 0
+chr1    3423436 3463436 1
+chr1    3463436 3783436 0
+chr1    3783436 3823436 1
+```
+
+
+```
+python3 phenosv/model/phenosv.py --c chr6 --s 156994830 --e 157006982 --svtype 'deletion' --noncoding 'path/to/tad_annotation.bed'
+```
+
 
 ## Annotate SVs
 
