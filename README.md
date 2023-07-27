@@ -229,11 +229,6 @@ chr1    3783436 3823436 1
 ```
 
 
-```
-python3 phenosv/model/phenosv.py --c chr6 --s 156994830 --e 157006982 --svtype 'deletion' --noncoding 'path/to/tad_annotation.bed'
-```
-
-
 ## Annotate SVs
 
 Using the above codes, PhenoSV annotates SVs with hundreds of genomic features on the fly and then feeds into the pre-trained model to make pathogenicity calls. Users can also save SV annotations forehead and make predictions afterward using the codes below. 
