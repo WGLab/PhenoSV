@@ -71,7 +71,10 @@ def init(configpath=None, ckpt=False, light = False):
 def main():
     global args
     args = parser.parse_args()
-    configs = init()
+    if args.model=='PhenoSV-light':
+        configs = init(light = True)
+    else:
+        configs = init(light = False)
     feature_files, scaler_file, ckpt_path, elements_path, annotation_path, tad_path, KBPATH = list(configs.values())
     if args.config:
         print(configs)
