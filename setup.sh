@@ -1,7 +1,7 @@
 #!/bin/bash
 
-
 fpath="$1"
+version="$2"
 
 if [[ -z "$fpath" ]]
 then
@@ -26,12 +26,25 @@ echo "unzipping H2GKBs.zip........"
 unzip -q "$fpath/H2GKBs.zip"
 rm "$fpath/H2GKBs.zip"
 
-if ! test -f "$fpath/PhenosvFile.tar"; then
-echo "downloading PhenoSV files........"
-wget https://www.openbioinformatics.org/PhenoSV/PhenosvFile.tar
+
+if [[ -z "$version" ]]
+then
+  if ! test -f "$fpath/PhenosvFile.tar"; then
+  echo "downloading PhenoSV files........"
+  wget https://www.openbioinformatics.org/PhenoSV/PhenosvFile.tar
+  fi
+  echo "unzipping PhenosvFile.tar........"
+  tar -xvf "$fpath/PhenosvFile.tar"
+  rm "$fpath/PhenosvFile.tar"
+else
+  if ! test -f "$fpath/PhenosvlightFile.tar"; then
+  echo "downloading PhenoSV-light files........"
+  wget https://www.openbioinformatics.org/PhenoSV/PhenosvFile.tar
+  fi
+  echo "unzipping PhenosvlightFile.tar........"
+  tar -xvf "$fpath/PhenosvlightFile.tar"
+  rm "$fpath/PhenosvlightFile.tar"
 fi
-echo "unzipping PhenosvFile.tar........"
-tar -xvf "$fpath/PhenosvFile.tar"
-rm "$fpath/PhenosvFile.tar"
+
 
 python3 $current_dir/phenosv/setup.py --path "$fpath/data"
