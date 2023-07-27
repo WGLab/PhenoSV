@@ -37,10 +37,10 @@ bash setup.sh /path/to/folder
 We also offered a light-weight version of PhenoSV as a highly efficient alternative of PhenoSV. PhenoSV-light consists of only 42 features with much improved annotation efficiency without compromising predictive accuracy except for translocations. The packed file takes about 50G storage. Run the codes below to set up PhenoSV-light. 
 
 ```
-bash setup_light.sh /path/to/folder
+bash setup.sh /path/to/folder 'light'
 ```
 
-Note that, users who downloaded the full set of required files using `setup.sh` can excute both PhenoSV and PhenoSV-light. Users who downloaded the light version files using `setup_light.sh` can only excute PhenoSV-light.
+Note that, users who downloaded the full set of required files using can excute both PhenoSV and PhenoSV-light. Users who downloaded the light version files can only excute PhenoSV-light.
 
 ### Step3: install PhenoSV as a python package (optional)
 
