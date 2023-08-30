@@ -191,6 +191,7 @@ def query_bw(bw_path: str, chrom: str, start: int, end: int, nbins: int, stat='m
             nbins = 1
         else:
             bins = [(start, end)]
+        #if no chrX
         if chrom in list(bw.chroms().keys()):
             OUT = []
             for Bin in bins:
