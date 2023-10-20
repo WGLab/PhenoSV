@@ -256,4 +256,4 @@ Use the codes below to download the simulation data.
 wget https://www.openbioinformatics.org/PhenoSV/prioritization_simulation.tar.gz
 ```
 
-
+Souce data of the paper used to generate all figures can be found  [here](https://github.com/WGLab/PhenoSV/tree/main/data)
