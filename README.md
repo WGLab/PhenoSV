@@ -1,5 +1,5 @@
 # PhenoSV: Interpretable phenotype-aware model for the prioritization of genes affected by structural variants.
-[![DOI](https://zenodo.org/badge/628754962.svg)](https://zenodo.org/doi/10.5281/zenodo.10028734)
+[![DOI](https://zenodo.org/badge/628754962.svg)](https://zenodo.org/doi/10.5281/zenodo.10028740)
 
 ## Background
 Structural variants (SVs) represent a major source of genetic variation and may be associated with phenotypic diversity and disease susceptibility. Recent advancements in long-read sequencing have revolutionized the field of SV detection, enabling the discovery of over 20,000 SVs per human genome. However, identifying and prioritizing disease-related SVs and assessing their functional impacts on individual genes remains challenging, especially for noncoding SVs. 
