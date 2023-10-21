@@ -122,7 +122,7 @@ def main():
             full_mode=True
         pred = of.phenosv(CHR=None, START=None, END=None, svtype=None,sv_df=sv_df, annotation_path=args.annotation_path, model=model,
                           elements_path=args.elements_path,feature_files=args.feature_files, scaler_file=args.scaler_file,tad_path = args.tad_path,
-                            cutoff_coding=0.4934, cutoff_noncoding=0.7901, HPO=HPO, pheno_adjust=1, full_mode = full_mode,feature_subset=feature_group_index)
+                            cutoff_coding=0.4934, cutoff_noncoding=0.7736, HPO=HPO, pheno_adjust=1, full_mode = full_mode,feature_subset=feature_group_index)
         pred.to_csv(dest_file)
 
 if __name__ == '__main__':

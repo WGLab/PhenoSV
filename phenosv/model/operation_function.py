@@ -487,7 +487,7 @@ def predict_noncodingsv(chr,start, end, svtype,elements_path,feature_files,scale
 ###############################predict new sv###################################
 
 def phenosv(CHR, START, END, svtype,sv_df=None, annotation_path=None, model=None, elements_path=None, feature_files=None, scaler_file=None,
-            tad_path=None,cutoff_coding=0.4934, cutoff_noncoding=0.7901, HPO=None, pheno_adjust=1,KBpath='/home/xu3/Phen2Gene/lib', full_mode = False,
+            tad_path=None,cutoff_coding=0.4934, cutoff_noncoding=0.7736, HPO=None, pheno_adjust=1,KBpath='/home/xu3/Phen2Gene/lib', full_mode = False,
             CHR2=None, START2=None,strand1='+',strand2='+', feature_subset=None):
     if svtype in ['insertion','inversion']:
         sv_df = pd.DataFrame({'CHR':[CHR],'START':[START],'END':[END],'SVTYPE':[svtype],'ID':[CHR+':'+str(START)+'-'+str(END)+'_'+str(svtype)]})
@@ -614,7 +614,7 @@ def input_gradient(CHR, START, END, SVTYPE, elements_path, feature_files, scaler
         cutoff = 0.4934
     else:
         batch, element_names , coords = read_global_features_singlesv(CHR, START, END, SVTYPE, elements_path, feature_files, scaler_file,tad_path, return_coords=True)
-        cutoff = 0.7901
+        cutoff = 0.7736
 
     sv_pred, _, element_pred = model.get_element_score(batch)
     if len(element_pred) > len(element_names):
