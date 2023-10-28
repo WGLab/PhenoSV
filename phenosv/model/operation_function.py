@@ -337,6 +337,10 @@ def read_global_features_singlesv(chr, start, end, svtype, elements_path, featur
     output: 1. batch 2. element names
     only support deletion and duplication for now
     """
+    if isinstance(scaler_file,str):
+        scaler_file_df = pd.read_csv(scaler_file)
+    else:
+        scaler_file_df = scaler_file
     if isinstance(elements_path,str):
         elements = pyBigWig.open(elements_path, "r")
     else:
@@ -369,18 +373,22 @@ def read_global_features_singlesv(chr, start, end, svtype, elements_path, featur
     if sv_tri[1] - tad_region_tri[1] > 1 and truncation!='left':
         left_bed = u.tri_to_bed([elements_coords_bed[0].chrom, elements_start, sv_bed[0].start])
         df_left = elements_coords_bed.intersect(left_bed).to_dataframe()
+        df_left_full = df_left
         df_left = df_left[df_left.name!='noncoding'].reset_index(drop=True)
         if df_left.shape[0]==0:
             df_left = None
     else:
+        df_left_full = None
         df_left = None
     if tad_region_tri[2] - sv_tri[2] > 1 and truncation!='right':
         right_bed = u.tri_to_bed([elements_coords_bed[0].chrom, sv_bed[0].end, elements_end])
         df_right = elements_coords_bed.intersect(right_bed).to_dataframe()
+        df_right_full = df_right
         df_right = df_right[df_right.name != 'noncoding'].reset_index(drop=True)
         if df_right.shape[0] == 0:
             df_right = None
     else:
+        df_right_full = None
         df_right = None
     df_sv = elements_coords_bed.intersect(sv_bed).to_dataframe()
     ##########
@@ -388,9 +396,22 @@ def read_global_features_singlesv(chr, start, end, svtype, elements_path, featur
     # ----left
     if df_left is not None:
         _, feature_array_left, _, element_name_left = rf.read_features(df_left, feature_files=feature_files)
+        feature_array_left_full = np.zeros((df_left_full.shape[0], 1, feature_array_left.shape[2]))
+        mask = (df_left_full['name'] != 'noncoding').values
+        feature_array_left_full[mask] = feature_array_left
+        feature_array_left = feature_array_left_full
+        element_name_left_full = np.array(['noncoding'] * df_left_full.shape[0])
+        element_name_left_full[mask] = element_name_left
+        element_name_left = element_name_left_full
         if scaler_file is not None:
             feature_array_left = rf.scale_features(feature_array_left, scaler_file=scaler_file)
         feature_array_left = np.concatenate((feature_array_left, 0.5 + np.zeros((feature_array_left.shape[0], feature_array_left.shape[1], 1))),axis=-1)
+    elif df_left_full is not None and df_left_full.shape[0] > 0:
+        element_name_left = df_left_full.name.tolist()
+        feature_array_left = np.zeros((1, 1, scaler_file_df.shape[0]))
+        feature_array_left = np.concatenate(
+            (feature_array_left, 0.5 + np.zeros((feature_array_left.shape[0], feature_array_left.shape[1], 1))),
+            axis=-1)
     else:
         feature_array_left = None
         element_name_left = None
@@ -406,9 +427,22 @@ def read_global_features_singlesv(chr, start, end, svtype, elements_path, featur
     # ----right
     if df_right is not None:
         _, feature_array_right, _, element_name_right = rf.read_features(df_right, feature_files=feature_files)
+        feature_array_right_full = np.zeros((df_right_full.shape[0], 1, feature_array_right.shape[2]))
+        mask = (df_right_full['name'] != 'noncoding').values
+        feature_array_right_full[mask] = feature_array_right
+        feature_array_right = feature_array_right_full
+        element_name_right_full = np.array(['noncoding'] * df_right_full.shape[0])
+        element_name_right_full[mask] = element_name_right
+        element_name_right = element_name_right_full
         if scaler_file is not None:
             feature_array_right = rf.scale_features(feature_array_right, scaler_file=scaler_file)
         feature_array_right = np.concatenate((feature_array_right, 0.5 + np.zeros((feature_array_right.shape[0], feature_array_right.shape[1], 1))),axis=-1)
+    elif df_right_full is not None and df_right_full.shape[0] > 0:
+        element_name_right = df_right_full.name.tolist()
+        feature_array_right = np.zeros((1, 1, scaler_file_df.shape[0]))
+        feature_array_right = np.concatenate(
+            (feature_array_right, 0.5 + np.zeros((feature_array_right.shape[0], feature_array_right.shape[1], 1))),
+            axis=-1)
     else:
         feature_array_right = None
         element_name_right = None
@@ -436,7 +470,8 @@ def read_global_features_singlesv(chr, start, end, svtype, elements_path, featur
     y_plackholder = torch.tensor(0).float()
     batch = (features, mask, gene_indicators, sv_indicators, y_plackholder)
     if return_coords:
-        return batch, element_names, (df_left,df_sv,df_right)
+        return batch, element_names, (df_left_full, df_sv, df_right_full)
+        #return batch, element_names, (df_left,df_sv,df_right)
     else:
         return batch, element_names
 
@@ -487,7 +522,7 @@ def predict_noncodingsv(chr,start, end, svtype,elements_path,feature_files,scale
 ###############################predict new sv###################################
 
 def phenosv(CHR, START, END, svtype,sv_df=None, annotation_path=None, model=None, elements_path=None, feature_files=None, scaler_file=None,
-            tad_path=None,cutoff_coding=0.4934, cutoff_noncoding=0.7736, HPO=None, pheno_adjust=1,KBpath='/home/xu3/Phen2Gene/lib', full_mode = False,
+            tad_path=None,cutoff_coding=0.4934, cutoff_noncoding=0.7901, HPO=None, pheno_adjust=1,KBpath='/home/xu3/Phen2Gene/lib', full_mode = False,
             CHR2=None, START2=None,strand1='+',strand2='+', feature_subset=None):
     if svtype in ['insertion','inversion']:
         sv_df = pd.DataFrame({'CHR':[CHR],'START':[START],'END':[END],'SVTYPE':[svtype],'ID':[CHR+':'+str(START)+'-'+str(END)+'_'+str(svtype)]})
@@ -614,7 +649,7 @@ def input_gradient(CHR, START, END, SVTYPE, elements_path, feature_files, scaler
         cutoff = 0.4934
     else:
         batch, element_names , coords = read_global_features_singlesv(CHR, START, END, SVTYPE, elements_path, feature_files, scaler_file,tad_path, return_coords=True)
-        cutoff = 0.7736
+        cutoff = 0.7901
 
     sv_pred, _, element_pred = model.get_element_score(batch)
     if len(element_pred) > len(element_names):
