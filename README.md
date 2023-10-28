@@ -117,6 +117,46 @@ PhenoSV will output results below. Without considering phenotype information, Ph
 
 ```
 
+Another example as shown in the paper, we investigated the SV that indirectly impacting SOX9 (Kurth et al. 2009, GRCh38, chr17: 70134929-71339950, duplication). This is a coding SV impacting exons of gene KCNJ16 and KCNJ2, as seen below. The model only predict direct impacts of coding SVs on genes within the SV region by default, and the pathogenicity score is 0.07, very likely to be benign.
+
+```
+python3 phenosv/model/phenosv.py --c chr17 --s 70134929 --e 71339950 --svtype 'duplication'
+```
+
+```
+  Elements  Pathogenicity           Type
+0       SV       0.066281      Coding SV
+1   KCNJ16       0.016484         Exonic
+2    KCNJ2       0.088711         Exonic
+
+```
+
+We can set add argument of `--inference 'full'` to infer both direct and indirect impacts of coding SVs. Here the model predict the SV pathogenicity score as 0.69 throught impacting genes indirectly, whereas the gene-level pathogenicity scores for MAP2K6 and SOX9 are 0.59 and 0.61 respectively. 
+
+```
+python3 phenosv/model/phenosv.py --c chr17 --s 70134929 --e 71339950 --svtype 'duplication' --inference 'full' --noncoding 'tad'
+```
+
+```
+  Elements  Pathogenicity                Type
+0       SV       0.066281           Coding SV
+1   KCNJ16       0.016484              Exonic
+2    KCNJ2       0.088711              Exonic
+3       SV       0.688360  Coding SV indirect
+4   MAP2K6       0.594582          Regulatory
+5     SOX9       0.610116          Regulatory
+
+```
+
+
+
+
+
+
+```
+python3 phenosv/model/phenosv.py --c chr6 --s 156994830 --e 157006982 --svtype 'deletion' --noncoding 'tad' --HPO 'HP:0000707,HP:0007598'
+```
+
 To run the PhenoSV-light model, simply add --model 'PhenoSV-light' as shown below.
 
 ```
