@@ -106,14 +106,14 @@ Since this example SV is a noncoding SV, PhenoSV's default setting is to conside
 python3 phenosv/model/phenosv.py --c chr6 --s 156994830 --e 157006982 --svtype 'deletion' --noncoding 'tad' --HPO 'HP:0000707,HP:0007598'
 ```
 
-PhenoSV will output results below. Without considering phenotype information, PhenoSV predicts the SV-level pathogenicity as 0.65. The gene-level pathogenicity scores are 0.82 for ARID1B by disrupting its introns, 0.05 for NOX3, and 0.34 for TFB1M by indirectly altering their regulatory elements. After adding phenotype information, PhenoSV scores are 0.65 for the whole SV and 0.82 for ARID1B gene.
+PhenoSV will output results below. Without considering phenotype information, PhenoSV predicts the SV-level pathogenicity as 0.65. The gene-level pathogenicity scores are 0.82 for ARID1B by disrupting its introns, 0.05 for NOX3, and 0.53 for TFB1M by indirectly altering their regulatory elements. After adding phenotype information, PhenoSV scores are 0.65 for the whole SV and 0.82 for ARID1B gene.
 
 ```
   Elements  Pathogenicity           Type  Phen2Gene   PhenoSV
-0       SV       0.653156  Non-coding SV   0.999126  0.652585
+0       SV       0.664912  Non-coding SV   0.999126  0.664331
 1   ARID1B       0.823556       Intronic   0.999126  0.822836
-2     NOX3       0.051570     Regulatory   0.837460  0.043188
-3    TFB1M       0.336612     Regulatory   0.544762  0.183373
+2     NOX3       0.045648     Regulatory   0.837460  0.038229
+3    TFB1M       0.533431     Regulatory   0.544762  0.290593
 
 ```
 
