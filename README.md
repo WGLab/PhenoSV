@@ -94,12 +94,14 @@ options:
 The running time of PhenoSV to score a single SV depends on the number of genes it impacted. For the examples below, PhenoSV is expected to generate results within a few seconds.
 
 #### deletion, duplication, insertion, inversion
+##### Example1
 You can use the following codes to score a single SV (deletion, duplication, insertion, inversion) easily by providing the SV location and type. The arguments required are: --c: chromosome, --s: start position, --e: end position (can be ignored by insertions), --svtype: types of SV.
 
 ```
 python3 phenosv/model/phenosv.py --c chr6 --s 156994830 --e 157006982 --svtype 'deletion'
 ```
 
+##### Example2
 Since this example SV is a noncoding SV, PhenoSV's default setting is to consider genes within 1Mbp upstream and downstream impacted. PhenoSV can also consider genes based on consensus TAD annotation by setting `--noncoding` argument as 'tad'. Prior phenotype information can be added using `--HPO` argument. Here is an example:
 
 ```
@@ -117,6 +119,7 @@ PhenoSV will output results below. Without considering phenotype information, Ph
 
 ```
 
+##### Example3
 Another example as shown in the paper, we investigated the SV that indirectly impacting SOX9 (Kurth et al. 2009, GRCh38, chr17: 70134929-71339950, duplication). This is a coding SV impacting exons of gene KCNJ16 and KCNJ2, as seen below. The model only predict direct impacts of coding SVs on genes within the SV region by default, and the pathogenicity score is 0.07, very likely to be benign.
 
 ```
@@ -149,13 +152,7 @@ python3 phenosv/model/phenosv.py --c chr17 --s 70134929 --e 71339950 --svtype 'd
 ```
 
 
-
-
-
-
-```
-python3 phenosv/model/phenosv.py --c chr6 --s 156994830 --e 157006982 --svtype 'deletion' --noncoding 'tad' --HPO 'HP:0000707,HP:0007598'
-```
+##### Example4
 
 To run the PhenoSV-light model, simply add --model 'PhenoSV-light' as shown below.
 
