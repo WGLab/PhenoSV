@@ -146,7 +146,7 @@ def main():
                 sv_df = sv_df.drop(sv_df[(sv_df['START1'] == -1) | (sv_df['START2'] == -1)].index).reset_index(drop=True)
 
         pred = of.phenosv(None, None, None, None, sv_df, annotation_path, model, elements_path, feature_files, scaler_file,
-                   tad_path,cutoff_coding=0.4934, cutoff_noncoding=0.7736, HPO=HPO, pheno_adjust=args.alpha,
+                   tad_path,cutoff_coding=0.4934, cutoff_noncoding=0.7901, HPO=HPO, pheno_adjust=args.alpha,
                    KBpath=KBPATH,full_mode=full_mode, CHR2=None, START2=None, strand1='+', strand2='+', feature_subset=feature_subset)
     else: #single SV
         s, e, s2 = args.s, args.e, args.s2
@@ -161,7 +161,7 @@ def main():
             e = s+1
 
         pred=of.phenosv(args.c, s, e, args.svtype, None, annotation_path, model, elements_path, feature_files, scaler_file,
-                   tad_path, cutoff_coding=0.4934, cutoff_noncoding=0.7736, HPO=args.HPO, pheno_adjust=args.alpha,
+                   tad_path, cutoff_coding=0.4934, cutoff_noncoding=0.7901, HPO=args.HPO, pheno_adjust=args.alpha,
                    KBpath=KBPATH, full_mode=full_mode, CHR2=args.c2, START2=s2, strand1=args.strand1, strand2=args.strand2,
                         feature_subset=feature_subset)
 
