@@ -574,7 +574,7 @@ def single_sv(CHR, START, END, svtype, annotation_path, model, elements_path, fe
     if u.annot_sv_single(CHR, START, END, annotation_path) == 'coding':
         pred = predict_codingsv(CHR, START, END, svtype, elements_path, feature_files,scaler_file, model, cutoff_coding, feature_subset=feature_subset)
         if full_mode:
-            pred2 = predict_noncodingsv(CHR, START, END, svtype, elements_path, feature_files,scaler_file, model, tad_path, cutoff_noncoding,feature_subset=feature_subset)
+            pred2 = predict_noncodingsv(CHR, START, END, svtype, elements_path, feature_files,scaler_file, model, tad_path, cutoff_noncoding,truncation=truncation,feature_subset=feature_subset)
             type=[]
             for t in pred2.Type.tolist():
                 if t=='Intronic':
