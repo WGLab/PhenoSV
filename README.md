@@ -7,7 +7,7 @@ Structural variants (SVs) represent a major source of genetic variation and may 
 PhenoSV is a phenotype-aware machine-learning model to predict pathogenicity of all types of structural variants (SVs) that disrupt either coding or noncoding genome regions, including deletions, duplications, insertions, inversions, and translocations. PhenoSV segments SVs and annotates each segment using hundreds of genomic features, then adopts a transformer-based architecture to predict functional impacts of SVs under a multiple-instance learning framework. When phenotype information is available, PhenoSV further utilizes gene-phenotype associations to prioritize disease-related SVs. 
 
 ## Web server
-For SVs that affect less than 10 protein-coding genes, we provide a web server at https://phenosv.wglab.org for easy applications of PhenoSV. If you want to score SVs that affect more than 10 genes or make batch predictions, please install PhenoSV and run offline. 
+For SVs that affect less than 30 protein-coding genes, we provide a web server at https://phenosv.wglab.org for easy applications of PhenoSV. If you want to score SVs that affect more than 10 genes or make batch predictions, please install PhenoSV and run offline. 
 
 ## Installation
 
