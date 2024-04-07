@@ -166,6 +166,8 @@ def get_global_genes(chr,start,end,elements_path,tad_path=None):
 
 ##breakpoint
 def bke_to_sv(CHR, BKE, ID, elements_path, annotation_path,svtype='insertion'):
+    if isinstance(BKE,str):
+        BKE = int(BKE)
     start = BKE
     end = int(start+1)
     anno = None
