@@ -39,7 +39,7 @@ then
 else
   if ! test -f "$fpath/PhenosvlightFile.tar"; then
   echo "downloading PhenoSV-light files........"
-  wget https://www.openbioinformatics.org/PhenoSV/PhenosvFile.tar
+  wget https://www.openbioinformatics.org/PhenoSV/PhenosvlightFile.tar
   fi
   echo "unzipping PhenosvlightFile.tar........"
   tar -xvf "$fpath/PhenosvlightFile.tar"
