@@ -547,6 +547,7 @@ def phenosv(CHR, START, END, svtype,sv_df=None, annotation_path=None, model=None
         sv_list = []
         for i in range(sv_df.shape[0]):
             CHR, START, END, svtype,ID = sv_df['CHR'][i], sv_df['START'][i], sv_df['END'][i], sv_df['SVTYPE'][i],sv_df['ID'][i]
+            START, END = int(START), int(END)
             sv = sv_transformation(CHR, START, END, svtype,ID,elements_path, annotation_path, None, None, full_mode = full_mode)
             if sv.shape[1]==5:
                 sv['TRUNCATION']=None

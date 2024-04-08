@@ -60,7 +60,6 @@ def init(configpath=None, ckpt=False, light = False):
         feature_files=os.path.join(Path,'features_set.csv')
         scaler_file = os.path.join(Path, 'features1026.csv')
         ckpt_path = os.path.join(Path, 'model-epoch=33-val_loss=0.33.ckpt')
-
     elements_path = os.path.join(Path, 'genes_w_noncoding.bb')
     annotation_path = os.path.join(Path, 'exon_gencode.bed')
     tad_path = os.path.join(Path, 'tad_w_boundary_08.bed')
