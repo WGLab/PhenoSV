@@ -27,7 +27,6 @@ parser.add_argument('--CHR', type=str)
 parser.add_argument('--START', type=int)
 parser.add_argument('--END', type=int)
 parser.add_argument('--SVTYPE', type=str)
-parser.add_argument('--cache', type=str, default=None, help='path to data cache')
 parser.add_argument('--force_noncoding', action='store_true')
 parser.add_argument('--force_noncoding_off', action='store_false',dest='force_noncoding')
 
@@ -50,10 +49,10 @@ def main():
     if os.path.isdir(args.target_folder) is False:
         os.makedirs(args.target_folder)
     of.input_gradient(CHR, START, END, SVTYPE, args.elements_path, args.feature_files, args.scaler_file, args.ckpt_path,
-                      annotation_path=args.annotation_path, cache=args.cache, target_file_name=args.sv_id,target_folder=args.target_folder,
+                      annotation_path=args.annotation_path, target_file_name=args.sv_id,target_folder=args.target_folder,
                       tad_path=args.tad_path, force_noncoding = args.force_noncoding)
     of.attention_map(CHR, START, END, SVTYPE, args.elements_path, args.feature_files, args.scaler_file, args.ckpt_path,
-                      annotation_path=args.annotation_path, cache=args.cache, target_file_name=args.sv_id,target_folder=args.target_folder,
+                      annotation_path=args.annotation_path, target_file_name=args.sv_id,target_folder=args.target_folder,
                       tad_path=args.tad_path, force_noncoding=args.force_noncoding)
     print('finished')
 
