@@ -282,7 +282,7 @@ def sv_transformation(CHR, START, END, SVTYPE, ID,elements_path, annotation_path
 
 
 #coding model features
-def read_local_features_singlesv(chr, start, end, svtype, elements_path, feature_files, scaler_file, return_coords=False,
+def read_local_features_singlesv(chr, start, end, svtype, elements_path, feature_files, scaler_file, cache, return_coords=False,
                                  feature_subset=None):
     """
     read features of a given coding SV
@@ -305,7 +305,7 @@ def read_local_features_singlesv(chr, start, end, svtype, elements_path, feature
     sv_region = ' '.join([str(i) for i in sv_tri])
     sv_region_bed = BedTool(sv_region, from_string=True)
     elements_coords_df = elements_coords_bed.intersect(sv_region_bed).to_dataframe()
-    _, features, _, _ = rf.read_features(elements_coords_df, feature_files=feature_files)
+    _, features, _, _ = rf.read_features(elements_coords_df, cache, feature_files=feature_files)
     features = rf.scale_features(features, scaler_file)
     if svtype == 'deletion':
         features = np.concatenate((features, np.zeros((features.shape[0], features.shape[1], 1))), axis=-1)
@@ -331,7 +331,7 @@ def read_local_features_singlesv(chr, start, end, svtype, elements_path, feature
     else:
         return batch, element_names
 #noncoding model features
-def read_global_features_singlesv(chr, start, end, svtype, elements_path, feature_files, scaler_file, tad_path=None, return_coords=False,
+def read_global_features_singlesv(chr, start, end, svtype, elements_path, feature_files, scaler_file, cache, tad_path=None, return_coords=False,
                                   truncation = None, feature_subset=None):
     """
     read features of a given noncoding SV
@@ -397,7 +397,7 @@ def read_global_features_singlesv(chr, start, end, svtype, elements_path, featur
     # get feature array
     # ----left
     if df_left is not None:
-        _, feature_array_left, _, element_name_left = rf.read_features(df_left, feature_files=feature_files)
+        _, feature_array_left, _, element_name_left = rf.read_features(df_left, cache, feature_files=feature_files)
         feature_array_left_full = np.zeros((df_left_full.shape[0], 1, feature_array_left.shape[2]))
         mask = (df_left_full['name'] != 'noncoding').values
         feature_array_left_full[mask] = feature_array_left
@@ -418,7 +418,7 @@ def read_global_features_singlesv(chr, start, end, svtype, elements_path, featur
         feature_array_left = None
         element_name_left = None
     # ----sv
-    _, feature_array_sv, _, element_name_sv = rf.read_features(df_sv, feature_files=feature_files)
+    _, feature_array_sv, _, element_name_sv = rf.read_features(df_sv, cache, feature_files=feature_files)
     element_name_sv_suffix = [e + '_sv' for e in element_name_sv]
     if scaler_file is not None:
         feature_array_sv = rf.scale_features(feature_array_sv, scaler_file=scaler_file)
@@ -428,7 +428,7 @@ def read_global_features_singlesv(chr, start, end, svtype, elements_path, featur
         feature_array_sv = np.concatenate((feature_array_sv, np.ones((feature_array_sv.shape[0], feature_array_sv.shape[1], 1))), axis=-1)
     # ----right
     if df_right is not None:
-        _, feature_array_right, _, element_name_right = rf.read_features(df_right, feature_files=feature_files)
+        _, feature_array_right, _, element_name_right = rf.read_features(df_right, cache, feature_files=feature_files)
         feature_array_right_full = np.zeros((df_right_full.shape[0], 1, feature_array_right.shape[2]))
         mask = (df_right_full['name'] != 'noncoding').values
         feature_array_right_full[mask] = feature_array_right
@@ -482,9 +482,9 @@ def prepare_model(ckpt_path):
     model.eval()
     return model
 
-def predict_codingsv(chr, start, end, svtype, elements_path, feature_files, scaler_file, model, calibration_cutoff=0.5, feature_subset=None):
+def predict_codingsv(chr, start, end, svtype, elements_path, feature_files, scaler_file, model, cache, calibration_cutoff=0.5, feature_subset=None):
     # prepare features and element names
-    batch, element_names = read_local_features_singlesv(chr, start, end, svtype, elements_path, feature_files, scaler_file, feature_subset=feature_subset)
+    batch, element_names = read_local_features_singlesv(chr, start, end, svtype, elements_path, feature_files, scaler_file, cache, feature_subset=feature_subset)
     # get prediction
     sv_pred, _, element_pred = model.get_element_score(batch)
     if len(element_pred)>len(element_names):
@@ -498,9 +498,9 @@ def predict_codingsv(chr, start, end, svtype, elements_path, feature_files, scal
     df = pd.DataFrame({'Elements': element_names, 'Pathogenicity': sv_pred_cali, 'Type':type_indicator})
     return df
 
-def predict_noncodingsv(chr,start, end, svtype,elements_path,feature_files,scaler_file,model,tad_path=None, calibration_cutoff=0.5, truncation=None, feature_subset=None):
+def predict_noncodingsv(chr,start, end, svtype,elements_path,feature_files,scaler_file,model, cache, tad_path=None, calibration_cutoff=0.5, truncation=None, feature_subset=None):
     #prepare features and element names
-    batch,element_names = read_global_features_singlesv(chr,start, end, svtype,elements_path,feature_files,scaler_file,tad_path, False,truncation, feature_subset=feature_subset)
+    batch,element_names = read_global_features_singlesv(chr,start, end, svtype,elements_path,feature_files,scaler_file,tad_path, cache, False,truncation, feature_subset=feature_subset)
     gene_names,intronic_gene_names = get_global_genes(chr,start,end,elements_path,tad_path)
     sv_pred, _, element_pred = model.get_element_score(batch)
     if len(element_pred)>len(element_names):
@@ -523,7 +523,7 @@ def predict_noncodingsv(chr,start, end, svtype,elements_path,feature_files,scale
 
 ###############################predict new sv###################################
 
-def phenosv(CHR, START, END, svtype,sv_df=None, annotation_path=None, model=None, elements_path=None, feature_files=None, scaler_file=None,
+def phenosv(CHR, START, END, svtype, sv_df=None, annotation_path=None, model=None, elements_path=None, feature_files=None, scaler_file=None,
             tad_path=None,cutoff_coding=0.4934, cutoff_noncoding=0.7901, HPO=None, pheno_adjust=1,KBpath='/home/xu3/Phen2Gene/lib', full_mode = False,
             CHR2=None, START2=None,strand1='+',strand2='+', feature_subset=None):
     if svtype in ['insertion','inversion']:
@@ -575,9 +575,9 @@ def single_sv(CHR, START, END, svtype, annotation_path, model, elements_path, fe
     annotation_path: can be a path or bed file
     """
     if u.annot_sv_single(CHR, START, END, annotation_path) == 'coding':
-        pred = predict_codingsv(CHR, START, END, svtype, elements_path, feature_files,scaler_file, model, cutoff_coding, feature_subset=feature_subset)
+        pred = predict_codingsv(CHR, START, END, svtype, elements_path, feature_files,scaler_file, model, KBpath, cutoff_coding, feature_subset=feature_subset)
         if full_mode:
-            pred2 = predict_noncodingsv(CHR, START, END, svtype, elements_path, feature_files,scaler_file, model, tad_path, cutoff_noncoding,truncation=truncation,feature_subset=feature_subset)
+            pred2 = predict_noncodingsv(CHR, START, END, svtype, elements_path, feature_files,scaler_file, model, KBpath, tad_path, cutoff_noncoding,truncation=truncation,feature_subset=feature_subset)
             type=[]
             for t in pred2.Type.tolist():
                 if t=='Intronic':
@@ -589,7 +589,7 @@ def single_sv(CHR, START, END, svtype, annotation_path, model, elements_path, fe
             pred2.Type = type
             pred = pd.concat((pred,pred2))
     else:
-        pred = predict_noncodingsv(CHR, START, END, svtype, elements_path, feature_files,scaler_file, model, tad_path, cutoff_noncoding,truncation=truncation,feature_subset=feature_subset)
+        pred = predict_noncodingsv(CHR, START, END, svtype, elements_path, feature_files,scaler_file, model, KBpath, tad_path, cutoff_noncoding,truncation=truncation,feature_subset=feature_subset)
     if HPO is not None:
         genescores = pg.phen2gene(HPO,KBpath, scale_score=True)
         if genescores is not None:
@@ -644,14 +644,14 @@ def multi_sv(sv_df, annotation_path, model,elements_path, feature_files, scaler_
 
 ##########################################model interpretability ##########################################
 
-def input_gradient(CHR, START, END, SVTYPE, elements_path, feature_files, scaler_file, ckpt_path, annotation_path,
+def input_gradient(CHR, START, END, SVTYPE, elements_path, feature_files, scaler_file, ckpt_path, annotation_path, cache,
                    target_file_name = None, target_folder=None, tad_path=None, force_noncoding=False):
     model = prepare_model(ckpt_path)
     if u.annot_sv_single(CHR, START, END, annotation_path) == 'coding' and force_noncoding==False:
-        batch, element_names, coords = read_local_features_singlesv(CHR, START, END, SVTYPE, elements_path, feature_files,scaler_file, return_coords=True)
+        batch, element_names, coords = read_local_features_singlesv(CHR, START, END, SVTYPE, elements_path, feature_files,scaler_file, cache, return_coords=True)
         cutoff = 0.4934
     else:
-        batch, element_names , coords = read_global_features_singlesv(CHR, START, END, SVTYPE, elements_path, feature_files, scaler_file,tad_path, return_coords=True)
+        batch, element_names , coords = read_global_features_singlesv(CHR, START, END, SVTYPE, elements_path, feature_files, scaler_file,tad_path, cache, return_coords=True)
         cutoff = 0.7901
 
     sv_pred, _, element_pred = model.get_element_score(batch)
@@ -678,14 +678,14 @@ def input_gradient(CHR, START, END, SVTYPE, elements_path, feature_files, scaler
     else:
         return gradient_map, input_gradient_map, element_names, prediction_df, coords
 
-def attention_map(CHR, START, END, SVTYPE, elements_path, feature_files, scaler_file, ckpt_path, annotation_path,
+def attention_map(CHR, START, END, SVTYPE, elements_path, feature_files, scaler_file, ckpt_path, annotation_path, cache,
                    target_file_name = None, target_folder=None, tad_path=None, force_noncoding=False):
     model = prepare_model(ckpt_path)
     if u.annot_sv_single(CHR, START, END, annotation_path) == 'coding' and force_noncoding==False:
-        batch, element_names = read_local_features_singlesv(CHR, START, END, SVTYPE, elements_path, feature_files,scaler_file)
+        batch, element_names = read_local_features_singlesv(CHR, START, END, SVTYPE, elements_path, feature_files, scaler_file, cache)
     else:
         batch, element_names = read_global_features_singlesv(CHR, START, END, SVTYPE, elements_path, feature_files,
-                                                             scaler_file, tad_path)
+                                                             scaler_file, tad_path, cache)
     x, _, gene_indicator, sv_indicator, _ = batch
     attention_maps = model.get_attention_maps(x, gene_indicator, sv_indicator)
     attention_maps = [att.detach().numpy() for att in attention_maps]

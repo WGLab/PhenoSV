@@ -39,11 +39,12 @@ def read_features_bb(sv_tri, feature_path, categories, stat = 'max',nbins=1, bin
     return feature_list #bin *feature
 
 
-def read_features(sv_df, feature_files='../../data/Features/featuremaster.csv'):
+def read_features(sv_df, cache, feature_files='../../data/Features/featuremaster.csv'):
     features_df = pd.read_csv(feature_files)
     #bw
     feature_name_bw = features_df.loc[features_df['type']=='bigwig','feature'].tolist()
     feature_path_bw = features_df.loc[features_df['type']=='bigwig','path'].tolist()
+    feature_path_bw = [cache + p for p in feature_name_bw]
     feature_mean = features_df.loc[features_df['type'] == 'bigwig', 'mean'].tolist()
     feature_mean = [int(f) for f in feature_mean]
     feature_max = features_df.loc[features_df['type'] == 'bigwig', 'max'].tolist()
@@ -68,6 +69,7 @@ def read_features(sv_df, feature_files='../../data/Features/featuremaster.csv'):
     #bb
     feature_name_bb = features_df.loc[features_df['type'] == 'bigbed', 'feature'].tolist()
     feature_path_bb = features_df.loc[features_df['type'] == 'bigbed', 'path'].tolist()
+    feature_path_bb = [cache + p for p in feature_name_bb]
     categories_bb = features_df.loc[features_df['type'] == 'bigbed', 'categories'].tolist()
     categories_bb = [int(c) for c in categories_bb]
     #update bb names

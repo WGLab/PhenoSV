@@ -11,13 +11,13 @@ from liftover import get_lifter
 
 
 parser = argparse.ArgumentParser(description='PhenoSV: phenotype-aware structural variants scoring')
-parser.add_argument('--config',action='store_true')
-parser.add_argument('--config_omit',dest='config', action='store_false')
+parser.add_argument('--print_config',action='store_true')
 #settings
 parser.add_argument('--genome', type=str, default='hg38', help="choose genome build between hg38 (default) and hg19")
 parser.add_argument('--alpha',type=float,default=1.0, required=False, help="A positive value with larger value representing more contribution of phenotype information in refining PhenoSV scores. Default is 1")
 parser.add_argument('--inference', type=str, help="leave it blank (default) if only considering direct impacts of coding SVs. Set to `full` if inferring both direct and indirect impacts of coding SVs")
 parser.add_argument('--model', type=str, default='PhenoSV', help="choose between PhenoSV (default) and PhenoSV-light")
+parser.add_argument('--cache', type=str, default=None, help='path to data cache')
 
 #input single sv
 parser.add_argument('--c',type=str, help='chromosome, e.g. chr1')#chrom
@@ -42,11 +42,13 @@ parser.add_argument('--target_file_name',type=str,default='sv_score',help='enter
 
 
 
-def init(configpath=None, ckpt=False, light = False):
-    if configpath is None:
+def init(cache=None, ckpt=False, light = False):
+    if cache:
+        KBPATH = cache
+    else:
         configpath = os.path.join(module_dir,'../lib/fpath.config')
-    with open(configpath) as fr:
-        KBPATH = fr.readline().rstrip('\n')
+        with open(configpath) as fr:
+            KBPATH = fr.readline().rstrip('\n')
     Path = os.path.join(KBPATH,'data')
     if light:
         feature_files=os.path.join(Path,'features_set_light.csv')
@@ -76,11 +78,11 @@ def main():
     global args
     args = parser.parse_args()
     if args.model=='PhenoSV-light':
-        configs = init(light = True)
+        configs = init(cache=args.cache, light = True)
     else:
-        configs = init(light = False)
+        configs = init(cache=args.cache, light = False)
     feature_files, scaler_file, ckpt_path, elements_path, annotation_path, tad_path, KBPATH, feature_subset = list(configs.values())
-    if args.config:
+    if args.print_config:
         print(configs)
         exit()
 
