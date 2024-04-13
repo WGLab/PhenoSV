@@ -27,7 +27,7 @@ def main():
 
     #init
     configs = init()
-    feature_files, scaler_file, _, elements_path, annotation_path, tad_path, _ = list(configs.values())
+    feature_files, scaler_file, _, elements_path, annotation_path, tad_path, _, _ = list(configs.values())
     if args.noncoding=='distance':
         tad_path = None
 
