@@ -8,6 +8,8 @@ worker=$3
 svdir=$(dirname $svfile)
 filename=$(basename $svfile)
 extension="${filename##*.}"
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
 
 line=$(wc -l $svfile | awk '{print $1}')
 v=$(($line/$worker))
@@ -28,13 +30,13 @@ then
 	for i in "$svdir/input_"*;do
   		inname=$(basename $i)
   		outname="${inname/input_/output_}"
-  		python3 phenosv.py --sv_file $i --target_folder $outfolder --target_file_name $outname &
+  		python3 $SCRIPT_DIR/phenosv.py --sv_file $i --target_folder $outfolder --target_file_name $outname &
 	done
 else
 	for i in "$svdir/input_"*;do
                 inname=$(basename $i)
                 outname="${inname/input_/output_}"
-                python3 phenosv.py --sv_file $i --HPO $4 --target_folder $outfolder --target_file_name $outname &
+                python3 $SCRIPT_DIR/phenosv.py --sv_file $i --HPO $4 --target_folder $outfolder --target_file_name $outname &
         done
 
 fi
