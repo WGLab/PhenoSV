@@ -127,7 +127,7 @@ def main():
             else:
                 sv_df.columns = ['CHR1','START1','END1','CHR2','START2','END2', 'STRAND1','STRAND2','ID']
 
-        valid_chromosomes = ['chr' + str(i) for i in range(1, 23)]
+        valid_chromosomes = ['chr' + str(i) for i in range(1, 23)]+['chrX','chrY']
         sv_df = sv_df[sv_df.iloc[:,0].isin(valid_chromosomes)].reset_index(drop=True)
 
         if 'HPO' in list(sv_df.columns):
