@@ -39,7 +39,7 @@ def read_features_bb(sv_tri, feature_path, categories, stat = 'max',nbins=1, bin
     return feature_list #bin *feature
 
 
-def read_features(sv_df, feature_files='../../data/Features/featuremaster.csv'):
+def read_features(sv_df, feature_files):
     features_df = pd.read_csv(feature_files)
     #bw
     feature_name_bw = features_df.loc[features_df['type']=='bigwig','feature'].tolist()

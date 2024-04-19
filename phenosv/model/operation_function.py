@@ -498,9 +498,9 @@ def predict_codingsv(chr, start, end, svtype, elements_path, feature_files, scal
     df = pd.DataFrame({'Elements': element_names, 'Pathogenicity': sv_pred_cali, 'Type':type_indicator})
     return df
 
-def predict_noncodingsv(chr,start, end, svtype,elements_path,feature_files,scaler_file,model,tad_path=None, calibration_cutoff=0.5, truncation=None, feature_subset=None):
+def predict_noncodingsv(chr,start, end, svtype,elements_path,feature_files,scaler_file,model, tad_path=None, calibration_cutoff=0.5, truncation=None, feature_subset=None):
     #prepare features and element names
-    batch,element_names = read_global_features_singlesv(chr,start, end, svtype,elements_path,feature_files,scaler_file,tad_path, False,truncation, feature_subset=feature_subset)
+    batch,element_names = read_global_features_singlesv(chr,start, end, svtype,elements_path,feature_files,scaler_file, tad_path, False,truncation, feature_subset=feature_subset)
     gene_names,intronic_gene_names = get_global_genes(chr,start,end,elements_path,tad_path)
     sv_pred, _, element_pred = model.get_element_score(batch)
     if len(element_pred)>len(element_names):
@@ -523,7 +523,7 @@ def predict_noncodingsv(chr,start, end, svtype,elements_path,feature_files,scale
 
 ###############################predict new sv###################################
 
-def phenosv(CHR, START, END, svtype,sv_df=None, annotation_path=None, model=None, elements_path=None, feature_files=None, scaler_file=None,
+def phenosv(CHR, START, END, svtype, sv_df=None, annotation_path=None, model=None, elements_path=None, feature_files=None, scaler_file=None,
             tad_path=None,cutoff_coding=0.4934, cutoff_noncoding=0.7901, HPO=None, pheno_adjust=1,KBpath='/home/xu3/Phen2Gene/lib', full_mode = False,
             CHR2=None, START2=None,strand1='+',strand2='+', feature_subset=None):
     if svtype in ['insertion','inversion']:
@@ -682,7 +682,7 @@ def attention_map(CHR, START, END, SVTYPE, elements_path, feature_files, scaler_
                    target_file_name = None, target_folder=None, tad_path=None, force_noncoding=False):
     model = prepare_model(ckpt_path)
     if u.annot_sv_single(CHR, START, END, annotation_path) == 'coding' and force_noncoding==False:
-        batch, element_names = read_local_features_singlesv(CHR, START, END, SVTYPE, elements_path, feature_files,scaler_file)
+        batch, element_names = read_local_features_singlesv(CHR, START, END, SVTYPE, elements_path, feature_files, scaler_file)
     else:
         batch, element_names = read_global_features_singlesv(CHR, START, END, SVTYPE, elements_path, feature_files,
                                                              scaler_file, tad_path)
