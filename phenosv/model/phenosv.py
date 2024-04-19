@@ -17,7 +17,7 @@ parser.add_argument('--genome', type=str, default='hg38', help="choose genome bu
 parser.add_argument('--alpha',type=float,default=1.0, required=False, help="A positive value with larger value representing more contribution of phenotype information in refining PhenoSV scores. Default is 1")
 parser.add_argument('--inference', type=str, help="leave it blank (default) if only considering direct impacts of coding SVs. Set to `full` if inferring both direct and indirect impacts of coding SVs")
 parser.add_argument('--model', type=str, default='PhenoSV', help="choose between PhenoSV (default) and PhenoSV-light")
-parser.add_argument('--cache', type=str, default=None, help='path to data cache')
+parser.add_argument('--cache', type=str, default=None, help='Path to data cache. This is used when data files are stored in a different path from the config file, otherwise leave it blank (default). Make sure the feature paths have been updated accordingly to this new path. update_config.sh is more recommanded')
 
 #input single sv
 parser.add_argument('--c',type=str, help='chromosome, e.g. chr1')#chrom
