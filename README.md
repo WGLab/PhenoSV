@@ -43,6 +43,13 @@ bash setup.sh /path/to/folder 'light'
 
 Note that, users who downloaded the full set of required files using can excute both PhenoSV and PhenoSV-light. Users who downloaded the light version files can only excute PhenoSV-light.
 
+If users need to change the path for storing required data files and would like to make changes for the config file, below codes can be excuted.
+
+```
+bash update_config.sh /path/to/newfolder 
+```
+
+
 ### Step3: install PhenoSV as a python package (optional)
 
 This step is not required. If you want to integrate PhenoSV into your own python scripts, you can install PhenoSV as a python package following the steps above.
