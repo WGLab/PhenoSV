@@ -1,9 +1,53 @@
 #!/bin/bash
 
-svfile=$1
-outfolder=$(echo $2| sed 's/\/$//')
-worker=$3
+worker=1 #set up default value
 
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --sv_file)
+      svfile="$2"
+      shift 2
+      ;;
+    --target_folder)
+      outfolder=$(echo "$2" | sed 's/\/$//')
+      shift 2
+      ;;
+    --workers)
+      worker="$2"
+      shift 2
+      ;;
+    --genome)
+      genome="$2"
+      shift 2
+      ;;
+    --alpha)
+      alpha="$2"
+      shift 2
+      ;;
+    --inference)
+      inference_mode="$2"
+      shift 2
+      ;;
+    --model)
+      model="$2"
+      shift 2
+      ;;
+    --HPO)
+      HPO_terms="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown argument: $1"
+      exit 1
+      ;;
+  esac
+done
+
+#svfile and outfolder are required arguments
+if [[ -z $svfile || -z $outfolder ]]; then
+  echo "Error: --sv_file and --target_folder are required arguments."
+  exit 1
+fi
 
 svdir=$(dirname $svfile)
 filename=$(basename $svfile)
@@ -25,21 +69,21 @@ done
 
 # loop over the smaller files and call phenosv.py in parallel
 echo "start running PhenoSV using $worker workers"
-if [ -z "$4" ]
-then
-	for i in "$svdir/input_"*;do
-  		inname=$(basename $i)
-  		outname="${inname/input_/output_}"
-  		python3 $SCRIPT_DIR/phenosv.py --sv_file $i --target_folder $outfolder --target_file_name $outname &
-	done
-else
-	for i in "$svdir/input_"*;do
-                inname=$(basename $i)
-                outname="${inname/input_/output_}"
-                python3 $SCRIPT_DIR/phenosv.py --sv_file $i --HPO $4 --target_folder $outfolder --target_file_name $outname &
-        done
 
-fi
+
+for i in "$svdir/input_"*; do
+  inname=$(basename "$i")
+  outname="${inname/input_/output_}"
+  python3 "$SCRIPT_DIR/phenosv.py" \
+    --sv_file "$i" \
+    --target_folder "$outfolder" \
+    --target_file_name "$outname" \
+    ${genome:+--genome "$genome"} \
+    ${alpha:+--alpha "$alpha"} \
+    ${inference_mode:+--inference "$inference_mode"} \
+    ${model:+--model "$model"} \
+    ${HPO_terms:+--HPO "$HPO_terms"} &
+done
 
 wait
 
