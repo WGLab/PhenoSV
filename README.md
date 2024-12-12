@@ -194,17 +194,12 @@ To score multiple SVs using a single process, run:
 python3 phenosv/model/phenosv.py --sv_file data/sampledata.bed --target_folder data/ --target_file_name sample_bed_out
 ```
 
-You can also score multiple SVs in parallel to speed up. Below is an example of running PhenoSV with 4 processes in parallel. Leave the HPO terms blank if they are already in the input file or you don't have prior phenotype information.
+You can also score multiple SVs in parallel to speed up. Below is an example of running PhenoSV with 4 processes in parallel (set up using `--workers` argument). Leave the HPO terms blank if they are already in the input file or you don't have prior phenotype information. 
 
 ```
-bash phenosv/model/phenosv.sh 'path/to/sv/data.csv' 'folder/path/to/store/results' 4 'HP:0000707,HP:0007598'
+bash phenosv/model/phenosv.sh --sv_file 'path/to/sv/data.csv' --target_folder 'folder/path/to/store/results' --workers 4 --HPO 'HP:0000707,HP:0007598' --model PhenoSV-light
 ```
 
-Similarly, run codes below for PhenoSV-light model.
-
-```
-bash phenosv/model/phenosv_light.sh 'path/to/sv/data.csv' 'folder/path/to/store/results' 4 'HP:0000707,HP:0007598'
-```
 
 
 ## Run PhenoSV in Python
