@@ -470,3 +470,10 @@ def liftover(chromosome,position,converter):
     else:
         position = conv[0][1]
     return position
+
+def liftover_region(chromosome,start,end,converter):
+    r1 = liftover(chromosome, start, converter=converter)
+    r2 = liftover(chromosome, end, converter=converter)
+    s = min(r1, r2)
+    e = max(r1, r2)
+    return s, e

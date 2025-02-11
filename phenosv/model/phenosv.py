@@ -139,8 +139,7 @@ def main():
 
         if converter is not None:
             if 'START' in list(sv_df.columns):
-                sv_df['START'] = [u.liftover(sv_df['CHR'][0], start, converter) for start in sv_df['START'].tolist()]
-                sv_df['END'] = [u.liftover(sv_df['CHR'][0], start, converter) for start in sv_df['END'].tolist()]
+                sv_df[['START','END']] = sv_df.apply(lambda row: pd.Series(u.liftover_region(row['CHR'], row['start'], row['end'], converter)), axis=1)
                 sv_df = sv_df.drop(sv_df[(sv_df['START'] == -1) | (sv_df['END'] == -1)].index).reset_index(drop=True)
             if 'START1' in list(sv_df.columns):
                 sv_df['START1'] = [u.liftover(sv_df['CHR1'][0], start, converter) for start in sv_df['START1'].tolist()]
@@ -153,10 +152,11 @@ def main():
     else: #single SV
         s, e, s2 = args.s, args.e, args.s2
         if converter is not None:
-            s = u.liftover(args.c, args.s, converter=converter)
-            e = u.liftover(args.c, args.e, converter=converter)
             if args.s2 is not None:
+                s = u.liftover(args.c, args.s, converter=converter)
                 s2 = u.liftover(args.c, args.s2, converter=converter)
+            else:
+                s, e = u.liftover_region(args.c, args.s, args.e, converter)
         if args.svtype=='translocation':
             assert args.c2 is not None and args.s2 is not None, f'for translocations, input c2 and s2 are required'
         if args.svtype=='insertion' and args.e is None:
